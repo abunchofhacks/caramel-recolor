@@ -44,6 +44,7 @@ static inline uint32_t determine_color(
 
 static PyObject* caramel_recolor(PyObject* self, PyObject* args)
 {
+	// Get the data.
 	PyObject* data;
 	PyObject* channels;
 
@@ -54,7 +55,8 @@ static PyObject* caramel_recolor(PyObject* self, PyObject* args)
 
 	if (!PyObject_CheckBuffer(data))
 	{
-		fprintf(stderr, "#### Not an array buffer\n");
+		PyErr_SetString(PyExc_RuntimeError,
+			"data is not an array buffer");
 		return NULL;
 	}
 
@@ -62,29 +64,33 @@ static PyObject* caramel_recolor(PyObject* self, PyObject* args)
 	if (PyObject_GetBuffer(data, &buffer,
 		PyBUF_WRITABLE | PyBUF_ANY_CONTIGUOUS | PyBUF_FORMAT))
 	{
-		fprintf(stderr, "#### Not a contiguous writable array\n");
-		PyObject *ptype, *pvalue, *ptraceback;
-		PyErr_Fetch(&ptype, &pvalue, &ptraceback);
-		fprintf(stderr, "#### Python Error: %s\n", PyString_AsString(pvalue));
+		if (!PyErr_Occurred())
+		{
+			PyErr_SetString(PyExc_RuntimeError,
+				"data is not a contiguous writable array");
+		}
 		return NULL;
 	}
 
 	if (strcmp(buffer.format, "I") != 0)
 	{
-		fprintf(stderr, "#### Not an array of 32bit unsigned integers\n");
+		PyErr_SetString(PyExc_RuntimeError,
+			"data is not an array of 32bit unsigned integers");
 		PyBuffer_Release(&buffer);
 		return NULL;
 	}
 
 	if (!PyList_Check(channels))
 	{
-		fprintf(stderr, "#### Not a list of channels\n");
+		PyErr_SetString(PyExc_RuntimeError,
+			"channels is not a list of gradients");
 		PyBuffer_Release(&buffer);
 		return NULL;
 	}
 	else if (PyList_Size(channels) != NUM_CHANNELS)
 	{
-		fprintf(stderr, "#### Does not have exactly 5 channels\n");
+		PyErr_SetString(PyExc_RuntimeError,
+			"channels contains wrong number of gradients");
 		PyBuffer_Release(&buffer);
 		return NULL;
 	}
@@ -95,7 +101,8 @@ static PyObject* caramel_recolor(PyObject* self, PyObject* args)
 		PyObject* item = PyList_GetItem(channels, i);
 		if (!PyObject_HasAttrString(item, "COLOR_RANGE"))
 		{
-			fprintf(stderr, "#### Does not have COLOR_RANGE\n");
+			PyErr_SetString(PyExc_RuntimeError,
+				"missing COLOR_RANGE attribute");
 			PyBuffer_Release(&buffer);
 			return NULL;
 		}
@@ -103,20 +110,23 @@ static PyObject* caramel_recolor(PyObject* self, PyObject* args)
 		PyObject* range = PyObject_GetAttrString(item, "COLOR_RANGE");
 		if (!range)
 		{
-			fprintf(stderr, "#### Cannot get COLOR_RANGE\n");
+			PyErr_SetString(PyExc_RuntimeError,
+				"broken COLOR_RANGE attribute");
 			PyBuffer_Release(&buffer);
 			return NULL;
 		}
 
 		if (!PyTuple_Check(range))
 		{
-			fprintf(stderr, "#### Not a range\n");
+			PyErr_SetString(PyExc_RuntimeError,
+				"COLOR_RANGE is not a tuple");
 			PyBuffer_Release(&buffer);
 			return NULL;
 		}
 		else if (PyTuple_Size(range) != VALUES_PER_CHANNEL)
 		{
-			fprintf(stderr, "#### Does not have exactly 6 values\n");
+			PyErr_SetString(PyExc_RuntimeError,
+				"wrong number of values in COLOR_RANGE");
 			PyBuffer_Release(&buffer);
 			return NULL;
 		}
@@ -126,7 +136,8 @@ static PyObject* caramel_recolor(PyObject* self, PyObject* args)
 			PyObject* val = PyTuple_GetItem(range, j);
 			if (!PyInt_Check(val))
 			{
-				fprintf(stderr, "#### Not an int\n");
+				PyErr_SetString(PyExc_RuntimeError,
+					"COLOR_RANGE contains non-integer values");
 				PyBuffer_Release(&buffer);
 				return NULL;
 			}
@@ -134,7 +145,8 @@ static PyObject* caramel_recolor(PyObject* self, PyObject* args)
 			long x = PyInt_AsLong(val);
 			if (x < 0)
 			{
-				fprintf(stderr, "#### Negative int\n");
+				PyErr_SetString(PyExc_RuntimeError,
+					"COLOR_RANGE contains incorrect values");
 				PyBuffer_Release(&buffer);
 				return NULL;
 			}
@@ -143,12 +155,14 @@ static PyObject* caramel_recolor(PyObject* self, PyObject* args)
 		}
 	}
 
+	// Process the data.
 	for (Py_ssize_t i = 0; i < buffer.len; i += buffer.itemsize)
 	{
 		uint32_t* color = (uint32_t*)(buffer.buf + i);
 		*color = determine_color(channeldata, *color);
 	}
 
+	// Done.
 	PyBuffer_Release(&buffer);
 	return Py_None;
 }
