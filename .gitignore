@@ -1,0 +1,34 @@
+# binaries
+
+
+# unignore directories with the same name as a binary
+!*/
+
+# make output folders
+/bin
+/build
+/.dep
+/.obj
+
+# output files
+*.o
+*.s
+*.i
+*.d
+*.Td
+*.a
+*.out*
+*.exe
+*.log
+*.dump*
+*.ps
+*.dot
+*.zip
+*.gz
+*.list
+
+# gedit
+*~
+
+# core dumps
+/*core*
