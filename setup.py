@@ -1,3 +1,20 @@
+#
+# [setup.py]
+#
+# Setup for the caramelrecolor module.
+#
+# Part of the Caramel Recolor library
+# developed by A Bunch of Hacks
+# commissioned by Joseph Hewitt.
+#
+# Copyright (c) 2019 A Bunch of Hacks
+#
+# License to be determined.
+#
+# [authors:]
+# Sander in 't Veld
+#
+
 from distutils.core import setup, Extension
 
 module1 = Extension('caramelrecolor',

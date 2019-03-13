@@ -1,3 +1,20 @@
+/**
+ * [caramelrecolor.c]
+ *
+ * Implementation for the caramelrecolor.recolor() method.
+ *
+ * Part of the Caramel Recolor library
+ * developed by A Bunch of Hacks
+ * commissioned by Joseph Hewitt.
+ *
+ * Copyright (c) 2019 A Bunch of Hacks
+ *
+ * License to be determined.
+ *
+ * [authors:]
+ * Sander in 't Veld
+ */
+
 #include "Python.h"
 
 
