@@ -15,17 +15,17 @@ enum
 
 static inline uint8_t generate_value(uint8_t vmax, uint8_t vmin, uint8_t level)
 {
-	return vmin + (((uint16_t) vmax - vmin) * level / 215);
+	return vmin + ((vmax - vmin) * level / 215);
 }
 
-static inline uint32_t generate_color(
-	uint8_t channel[VALUES_PER_CHANNEL], uint8_t level)
+static inline uint32_t generate_color(uint8_t channel[VALUES_PER_CHANNEL],
+	uint8_t level)
 {
 	level = (level > 40) ? (level - 40) : 0;
 	uint8_t r = generate_value(channel[0], channel[3], level);
 	uint8_t g = generate_value(channel[1], channel[4], level);
 	uint8_t b = generate_value(channel[2], channel[5], level);
-	return 0xFF000000 | (r << 16) | (g << 8) | b;
+	return (r << 16) | (g << 8) | b;
 }
 
 static inline uint32_t determine_color(
