@@ -36,4 +36,6 @@ setup (name = 'Caramel Recolor',
 	description = 'Reimplementation of the Gearhead Caramel recolor algorithm',
 	author = 'Sander in \'t Veld',
 	author_email = 'sander@abunchofhacks.coop',
+	url = 'https://github.com/abunchofhacks/caramel-recolor',
+	license = 'LGPLv3+',
 	ext_modules = [module1])
