@@ -1,10 +1,4 @@
-# binaries
-
-
-# unignore directories with the same name as a binary
-!*/
-
-# make output folders
+# output folders
 /bin
 /build
 /.dep
@@ -27,7 +21,7 @@
 *.gz
 *.list
 
-# gedit
+# text editor backups
 *~
 
 # core dumps
